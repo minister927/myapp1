@@ -56,6 +56,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+    console.log('🆕bom_head 新增数据:', body);
     await pool.execute(
       `INSERT INTO bom_head
         (bom_code, bom_name, product_id, bom_version, bom_type, bom_status,

@@ -66,6 +66,7 @@ export default function BomTreePage() {
       const bid = String(key).split('-')[0];
       let nodes: SeriesNode[] = [];
       try {
+        console.log('当前树加载节点数据，key:', key, '深度:', d);
         if (d === 1) {
           const res = await fetch(`/api/bom_detail/${bid}`).then(r => r.json());
           const list = res.data || res;
@@ -96,8 +97,9 @@ export default function BomTreePage() {
     });
 
   /* ===== 点击树节点 → 刷新右表 ===== */
-  const onTreeSelect = (keys: React.Key[]) => {
+  const onTreeSelect = (keys: React.Key[], ) => {
     const key = keys[0];
+    console.log('所点击即选中的树节点，key:', key);
     if (!key) return;
     setSelectedKey(key);
     reloadTableByKey(key);
@@ -167,11 +169,14 @@ export default function BomTreePage() {
 
   const handleEdit = (record: any) => {
     setEditingRecord(record);
-    const d = depth;
+    // const d = depth;
+     const currentKey = String(selectedKey);
+     console.log('当前编辑的记录，selectedKey:', currentKey, 'record:', record);
+    const d = currentKey.split('-').length; // 实时计算当前节点的层级
     const vals =
       d === 1
         ? {
-            bom_code: record.bom_code ?? record.bomCode,
+            bom_code: record.bom_code ?? record.bomCode,//用于兼容新旧字段
             bom_name: record.bom_name ?? record.bomName,
             product_id: record.product_id ?? record.productId,
           }
@@ -201,9 +206,14 @@ export default function BomTreePage() {
       const prefix = getRestPrefix(depth);
       const id = editingRecord ? editingRecord.bom_id || editingRecord.detail_id || editingRecord.material_id : '';
       const method = editingRecord ? 'PUT' : 'POST';
+      console.log("修改所需提交的method：",method);
+      console.log("修改所需提交的prefix：",prefix);
+      console.log("修改所需提交的vals：",vals);
+      console.log("修改所需提交的editingRecord：",editingRecord);
+      console.log("修改所需提交的depth：",depth);
       let body: any;
       if (depth === 1) {
-        body = { bom_id: editingRecord.bom_id, bom_code: vals.bom_code, bom_name: vals.bom_name, product_id: vals.product_id };
+        body = { bom_id: editingRecord?.bom_id?? null, bom_code: vals.bom_code, bom_name: vals.bom_name, product_id: vals.product_id };// bom_id: editingRecord?.bom_id?? null, 用于新增时传null
       } else if (depth === 2) {
         // 新增/修改 BOM 明细，确保 parent_material_id 使用当前选中 detailId（如适用）
         body = {
@@ -213,7 +223,6 @@ export default function BomTreePage() {
       } else {
         body = { material_id: editingRecord.material_id,material_code: vals.material_code, material_name: vals.material_name, material_type: vals.material_type, unit: vals.unit };
       }
-
       console.log("修改所需提交的body：",body);
 
       // const res = await fetch(`${prefix}${editingRecord ? `/${id}` : ''}`, {
@@ -226,10 +235,27 @@ export default function BomTreePage() {
       message.success('保存成功');
       setModalOpen(null);
       reloadTableByKey(String(selectedKey));
-      /* 若是新增 BOM 头，同步插入树节点 */
+      // /* 若是新增 BOM 头，同步插入树节点 */
+      // if (!editingRecord && depth === 1) {
+      //   setTreeData(origin => [...origin, { title: vals.bom_name, key: String(res.data.bom_id), isLeaf: false }]);
+      // } 
+      // 在 handleSubmit 函数中，替换原来的树节点插入逻辑
       if (!editingRecord && depth === 1) {
-        setTreeData(origin => [...origin, { title: vals.bom_name, key: String(res.data.bom_id), isLeaf: false }]);
-      } 
+        // 新增 BOM 头后，重新加载整个树
+        fetch('/api/bom_head')
+          .then(r => r.json())
+          .then(res => {
+            const list = res.data || res;
+            setTreeData(
+              list.map((item: any) => ({
+                title: item.bom_name,
+                key: String(item.bom_id),
+                isLeaf: false,
+              }))
+            );
+          })
+          .catch(() => message.error('新增后刷新 BOM 树失败'));
+      }
     } catch (e: any) {
       message.error(e.message);
     } finally {
@@ -245,7 +271,7 @@ export default function BomTreePage() {
       const res = await fetch(prefix, 
         { method: 'DELETE' ,
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ record })
+          body: JSON.stringify(record)
          })
         .then(r => r.json());
       if (!res.ok) throw new Error(res.message || '失败');
@@ -260,9 +286,10 @@ export default function BomTreePage() {
     }
   };
 
-  const OpButtons = ({ record }: { record: any }) => (
+  const OpButtons = ({ record }: { record: any } ) => (
+    console.log('渲染操作按钮，record:', record),
     <Space>
-      <Button type="link" size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
+      <Button type="link" size="small" icon={<EditOutlined />} onClick={() => handleEdit(record,selectedKey)}>
         编辑
       </Button>
       <Popconfirm title="确定删除?" onConfirm={() => handleDelete(record)}>
@@ -356,9 +383,7 @@ export default function BomTreePage() {
               <Form.Item label="损耗率%" name="loss_rate">
                 <InputNumber style={{ width: '100%' }} />
               </Form.Item>
-              <Form.Item label="关联的BOM ID（外键）" name="referenceDesignator">
-                <Input />
-              </Form.Item>
+
             </>
           )}
           {depth === 3 && (
