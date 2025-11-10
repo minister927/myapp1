@@ -1,4 +1,3 @@
-// src/app/admin/dashboard/materialmanage/bom/BomTable.tsx
 'use client';
 
 import { Table, message } from 'antd';
@@ -8,7 +7,6 @@ import AddButton from './AddButton';
 import EditButton from './EditButton';
 import DeleteButton from './DeleteButton';
 import QueryBar from './QueryBar';
-import ChangeLog from './ChangeLog';
 
 export default function BomTable() {
   const [data, setData] = useState<any[]>([]);         //定义返回的data数组的类型
@@ -53,7 +51,6 @@ export default function BomTable() {
     render: (_: any, record: any) => (
       <>
         {/* record={record} 用以将当前行的数据交与子组件*/}
-        <ChangeLog record={record}  onOk={fetchData}/>
         <EditButton record={record} onOk={fetchData} />       
         <DeleteButton record={record} onOk={fetchData} />
       </>

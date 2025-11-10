@@ -32,3 +32,4 @@ export const BOM_FIELDS: Field[] = [
   { key: 'expiration_date', label: '失效日期', widget: 'date' },
   { key: 'creator', label: '创建人', widget: 'input', initialValue: 'System' },
 ];
+//暂时不知道该文件有什么用，可能后续扩展再此处集中定义，如Java的实体类

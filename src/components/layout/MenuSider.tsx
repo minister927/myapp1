@@ -38,19 +38,29 @@ export default function MenuSider({ collapsed }: { collapsed?: boolean }) {
           label: '客户管理',
         },
         {
-          key: 'material', // 物料管理
+          key: '/', // 物料管理
           icon: <AppstoreOutlined />,
           label: '物料管理',
           children: [
             {
               key: '/admin/dashboard/material',
               icon: <DesktopOutlined />,
-              label: '物料信息',
+              label: '成品信息',
             },
             {
-              key: '/admin/dashboard/bommanage',
+              key: '/admin/dashboard/bom_info',
               icon: <PicRightOutlined />,
               label: 'BOM 信息',
+            },
+             {
+              key: '/admin/dashboard/bom_detailinfo',
+              icon: <PicRightOutlined />,
+              label: 'BOM 详情',
+            },
+             {
+              key: '/admin/dashboard/material_info',
+              icon: <PicRightOutlined />,
+              label: '物料信息',
             },
           ],
         },
