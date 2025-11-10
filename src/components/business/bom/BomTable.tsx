@@ -8,6 +8,7 @@ import AddButton from './AddButton';
 import EditButton from './EditButton';
 import DeleteButton from './DeleteButton';
 import QueryBar from './QueryBar';
+import ChangeLog from './ChangeLog';
 
 export default function BomTable() {
   const [data, setData] = useState<any[]>([]);         //定义返回的data数组的类型
@@ -40,15 +41,19 @@ export default function BomTable() {
 
   useEffect(() => {       //// 组件首次挂载 或 keyword 变化时重新拉数据
     fetchData();          //api内 ‘查’ 的接口决定获取数据，本接口用于获取全部数据
-  }, [keyword]);
+  }, []);
+
+
+
 
   const actions = {
     title: '操作',
     key: 'action',
-    width: 200,
+    width: 300,
     render: (_: any, record: any) => (
       <>
         {/* record={record} 用以将当前行的数据交与子组件*/}
+        <ChangeLog record={record}  onOk={fetchData}/>
         <EditButton record={record} onOk={fetchData} />       
         <DeleteButton record={record} onOk={fetchData} />
       </>

@@ -1,6 +1,7 @@
 // src/app/admin/dashboard/materialmanage/bom/config.ts
 // 当前模块：BOM 管理页「静态配置」集中写在这里，方便一处改、处处生效
 export const API_PATH = '/api/bom_head';
+export const API_PATH_changelog = '/api/change_log';
 
 export const columns = [
   { title: 'BOM编码', dataIndex: 'bom_code', key: 'bom_code' },
@@ -16,4 +17,5 @@ export const columns = [
     width: 160,
     render: (v: string) => new Date(v).toLocaleString(),//渲染
   },
+  
 ];
