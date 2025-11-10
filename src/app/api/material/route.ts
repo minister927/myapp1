@@ -1,41 +1,69 @@
-import { NextResponse } from 'next/server';
+// app/api/material/route.ts
+import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
-import { NextRequest } from 'next/server';
 
-/* ========== GET：查询物料（支持多条件） ========== */
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
+  
+  console.log('🔍 material 原始 URL:', req.url);
+  console.log('🔍 material searchParams 条目:', Array.from(sp.entries()));
 
-  console.log('🔍 原始 URL:', req.url);
-  console.log('🔍 searchParams 条目:', Array.from(sp.entries()));
-
-  // 提取查询参数
+  // 提取所有查询参数
   const materialId = sp.get('material_id');
   const materialCode = sp.get('material_code');
   const materialName = sp.get('material_name');
-  const materialType = sp.get('material_type'); // Product/Semi-Finished/Raw/Component/Auxiliary
-  const isActive = sp.get('is_active');
+  const materialType = sp.get('material_type'); // Product | Semi-Finished | Raw | Component | Auxiliary
+  const materialSpecs = sp.get('material_specs');
+  const unit = sp.get('unit');
+  const unitPriceMin = sp.get('unit_price_min');
+  const unitPriceMax = sp.get('unit_price_max');
+  const supplier = sp.get('supplier');
+  const isActive = sp.get('is_active'); // 1 | 0
+  const createdAtFrom = sp.get('created_at_from');
+  const createdAtTo = sp.get('created_at_to');
+  const updatedAtFrom = sp.get('updated_at_from');
+  const updatedAtTo = sp.get('updated_at_to');
 
-  // 动态构建查询条件
+  // 构建动态 WHERE 子句
   const cond: string[] = [];
   const vals: any[] = [];
 
-  if (materialId) cond.push('material_id = ?'), vals.push(Number(materialId));
-  if (materialCode) cond.push('material_code LIKE ?'), vals.push(`%${materialCode}%`);
-  if (materialName) cond.push('material_name LIKE ?'), vals.push(`%${materialName}%`);
-  if (materialType) cond.push('material_type = ?'), vals.push(materialType);
-  if (isActive !== null) cond.push('is_active = ?'), vals.push(Number(isActive));
+  // 精确匹配（整数类型）
+  if (materialId) { cond.push('material_id = ?'); vals.push(Number(materialId)); }
+  if (isActive !== null && isActive !== '') { cond.push('is_active = ?'); vals.push(Number(isActive)); }
+
+  // 精确匹配（枚举类型）
+  if (materialType) { cond.push('material_type = ?'); vals.push(materialType); }
+  if (unit) { cond.push('unit = ?'); vals.push(unit); }
+
+  // 模糊匹配（字符串类型）
+  if (materialCode) { cond.push('material_code LIKE ?'); vals.push(`%${materialCode}%`); }
+  if (materialName) { cond.push('material_name LIKE ?'); vals.push(`%${materialName}%`); }
+  if (materialSpecs) { cond.push('material_specs LIKE ?'); vals.push(`%${materialSpecs}%`); }
+  if (supplier) { cond.push('supplier LIKE ?'); vals.push(`%${supplier}%`); }
+
+  // 数值范围查询（单价）
+  if (unitPriceMin) { cond.push('unit_price >= ?'); vals.push(Number(unitPriceMin)); }
+  if (unitPriceMax) { cond.push('unit_price <= ?'); vals.push(Number(unitPriceMax)); }
+
+  // 时间范围查询
+  if (createdAtFrom) { cond.push('created_at >= ?'); vals.push(createdAtFrom); }
+  if (createdAtTo) { cond.push('created_at <= ?'); vals.push(createdAtTo); }
+  if (updatedAtFrom) { cond.push('updated_at >= ?'); vals.push(updatedAtFrom); }
+  if (updatedAtTo) { cond.push('updated_at <= ?'); vals.push(updatedAtTo); }
 
   const where = cond.length ? `WHERE ${cond.join(' AND ')}` : '';
-  const sql = `SELECT * FROM material ${where} ORDER BY material_id`;
+  const sql = `SELECT * FROM material ${where} ORDER BY material_id ASC`;
 
   try {
     const [rows] = await pool.query(sql, vals);
+    console.log('✅ material 查询成功，记录数:', Array.isArray(rows) ? rows.length : 0);
     console.log('🔍 SQL:', sql);
     console.log('🔍 绑定值:', vals);
     return NextResponse.json(rows);
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (error: any) {
+    console.error('❌ material 查询失败:', error);
+    return NextResponse.json({ error: '查询失败', details: error.message }, { status: 500 });
   }
 }
 

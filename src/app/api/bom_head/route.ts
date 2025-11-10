@@ -1,5 +1,5 @@
 // src/app/api/bom_head/route.ts
-import { NextResponse } from 'next/server';
+import { NextRequest,NextResponse } from 'next/server';
 import pool from '@/lib/db';
 
 /* ========== 直接返回全表数据 ========== */

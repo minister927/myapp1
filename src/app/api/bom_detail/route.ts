@@ -1,43 +1,66 @@
-import { NextResponse } from 'next/server';
+// app/api/bom_detail/route.ts
+import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
-import { NextRequest } from 'next/server';
 
-/* ========== GET：查询明细（支持多条件） ========== */
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
+  
+  console.log('🔍 bom_detail 原始 URL:', req.url);
+  console.log('🔍 bom_detail searchParams 条目:', Array.from(sp.entries()));
 
-  console.log('🔍 原始 URL:', req.url);
-  console.log('🔍 searchParams 条目:', Array.from(sp.entries()));
-
-  // 提取查询参数
+  // 提取所有查询参数
   const detailId = sp.get('detail_id');
   const bomId = sp.get('bom_id');
   const parentMaterialId = sp.get('parent_material_id');
   const componentMaterialId = sp.get('component_material_id');
+  const quantity = sp.get('quantity');
+  const lossRate = sp.get('loss_rate');
+  const operationSeq = sp.get('operation_seq');
   const isCritical = sp.get('is_critical');
+  const referenceDesignator = sp.get('reference_designator');
+  const notes = sp.get('notes');
+  const createdAtFrom = sp.get('created_at_from');
+  const createdAtTo = sp.get('created_at_to');
 
-  // 动态构建查询条件
+  // 构建动态 WHERE 子句
   const cond: string[] = [];
   const vals: any[] = [];
 
-  if (detailId) cond.push('detail_id = ?'), vals.push(Number(detailId));
-  if (bomId) cond.push('bom_id = ?'), vals.push(Number(bomId));
-  if (parentMaterialId) cond.push('parent_material_id = ?'), vals.push(Number(parentMaterialId));
-  if (componentMaterialId) cond.push('component_material_id = ?'), vals.push(Number(componentMaterialId));
-  if (isCritical !== null) cond.push('is_critical = ?'), vals.push(Number(isCritical));
+  // 精确匹配（整数类型）
+  if (detailId) { cond.push('detail_id = ?'); vals.push(Number(detailId)); }
+  if (bomId) { cond.push('bom_id = ?'); vals.push(Number(bomId)); }
+  if (parentMaterialId) { cond.push('parent_material_id = ?'); vals.push(Number(parentMaterialId)); }
+  if (componentMaterialId) { cond.push('component_material_id = ?'); vals.push(Number(componentMaterialId)); }
+  if (operationSeq) { cond.push('operation_seq = ?'); vals.push(Number(operationSeq)); }
+  if (isCritical !== null && isCritical !== '') { cond.push('is_critical = ?'); vals.push(Number(isCritical)); }
+
+  // 精确匹配（小数类型）
+  if (quantity) { cond.push('quantity = ?'); vals.push(Number(quantity)); }
+  if (lossRate) { cond.push('loss_rate = ?'); vals.push(Number(lossRate)); }
+
+  // 模糊匹配（字符串类型）
+  if (referenceDesignator) { cond.push('reference_designator LIKE ?'); vals.push(`%${referenceDesignator}%`); }
+  if (notes) { cond.push('notes LIKE ?'); vals.push(`%${notes}%`); }
+
+  // 时间范围查询
+  if (createdAtFrom) { cond.push('created_at >= ?'); vals.push(createdAtFrom); }
+  if (createdAtTo) { cond.push('created_at <= ?'); vals.push(createdAtTo); }
 
   const where = cond.length ? `WHERE ${cond.join(' AND ')}` : '';
-  const sql = `SELECT * FROM bom_detail ${where} ORDER BY detail_id`;
+  const sql = `SELECT * FROM bom_detail ${where} ORDER BY detail_id `;
 
   try {
     const [rows] = await pool.query(sql, vals);
+    console.log('✅ bom_detail 查询成功，记录数:', Array.isArray(rows) ? rows.length : 0);
     console.log('🔍 SQL:', sql);
     console.log('🔍 绑定值:', vals);
     return NextResponse.json(rows);
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (error: any) {
+    console.error('❌ bom_detail 查询失败:', error);
+    return NextResponse.json({ error: '查询失败', details: error.message }, { status: 500 });
   }
 }
+
 
 /* ========== POST：新增明细 ========== */
 export async function POST(req: Request) {
