@@ -1,6 +1,6 @@
 // src/app/admin/dashboard/material_info/page.tsx
-import BomTable from '@/components/business/material_info/BomDetailTable';
+import MaterialTable from '@/components/business/material_info/MaterialTable';
 
-export default function BomPage() {
-  return <BomTable />;
+export default function materialPage() {
+  return <MaterialTable />;
 }

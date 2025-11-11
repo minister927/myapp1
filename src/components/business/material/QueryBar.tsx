@@ -61,11 +61,11 @@ export default function QueryBar({ depth, onSearch }: QueryBarProps) {
     }
   };
 
-  // 根据 depth 获取主搜索字段名
+  // 根据 depth 获取主搜索字段名,引号内关键字不可加多余空格
   const getMainSearchField = () => {
     switch(depth) {
       case 1: return 'bom_name';
-      case 2: return 'notes ';
+      case 2: return 'notes';
       case 3: return 'material_name';
       default: return 'bom_name';
     }
