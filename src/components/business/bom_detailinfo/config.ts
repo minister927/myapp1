@@ -14,13 +14,13 @@ export const columns = [
     title: '父项物料', 
     dataIndex: 'parent_material_id', 
     key: 'parent_material_id',
-    render: (id: number) => `物料-${id}`
+    render: (parent_material_id: number) => `物料-${parent_material_id}`
   },
   { 
     title: '子项组件', 
     dataIndex: 'component_material_id', 
     key: 'component_material_id',
-    render: (id: number) => `组件-${id}`
+    render: (component_material_id: number) => `组件-${component_material_id}`
   },
   { 
     title: '用量', 

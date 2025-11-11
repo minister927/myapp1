@@ -65,7 +65,7 @@ export default function EditButton({ record, onOk }: {
             <Input disabled />
           </Form.Item>
           
-          <Form.Item label="BOM ID" name="bom_id" rules={[{ required: true }]}>
+          <Form.Item label="关联BOM ID" name="bom_id" rules={[{ required: true }]}>
             <InputNumber style={{ width: '100%' }} />
           </Form.Item>
           

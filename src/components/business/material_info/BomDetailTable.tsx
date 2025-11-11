@@ -65,7 +65,7 @@ export default function BomTable() {
     const params = new URLSearchParams();
     Object.entries(q).forEach(([k, v]) => v && params.append(k, v));
 
-    const res = await fetch(`/api/bom_detail?${params}`);
+    const res = await fetch(`/api/material?${params}`);
     const list = await res.json();
     setData(Array.isArray(list) ? list : []);
     setLoading(false);
@@ -79,7 +79,7 @@ export default function BomTable() {
         <AddButton onOk={fetchData} />
       </div>
       <Table
-        rowKey="detail_id"                   //主键字段
+        rowKey="material_id"                   //主键字段
         loading={loading}                 //判断加载状态
         columns={[...columns, actions]}   //合并静态列和操作列，两个列合成到一个列内
         dataSource={data}                //赋予数据

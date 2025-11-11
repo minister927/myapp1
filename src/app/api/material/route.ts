@@ -12,17 +12,14 @@ export async function GET(req: NextRequest) {
   const materialId = sp.get('material_id');
   const materialCode = sp.get('material_code');
   const materialName = sp.get('material_name');
-  const materialType = sp.get('material_type'); // Product | Semi-Finished | Raw | Component | Auxiliary
+  const materialType = sp.get('material_type');
   const materialSpecs = sp.get('material_specs');
   const unit = sp.get('unit');
-  const unitPriceMin = sp.get('unit_price_min');
-  const unitPriceMax = sp.get('unit_price_max');
+  const unitPrice = sp.get('unit_price');
   const supplier = sp.get('supplier');
-  const isActive = sp.get('is_active'); // 1 | 0
+  const isActive = sp.get('is_active');
   const createdAtFrom = sp.get('created_at_from');
   const createdAtTo = sp.get('created_at_to');
-  const updatedAtFrom = sp.get('updated_at_from');
-  const updatedAtTo = sp.get('updated_at_to');
 
   // 构建动态 WHERE 子句
   const cond: string[] = [];
@@ -32,28 +29,25 @@ export async function GET(req: NextRequest) {
   if (materialId) { cond.push('material_id = ?'); vals.push(Number(materialId)); }
   if (isActive !== null && isActive !== '') { cond.push('is_active = ?'); vals.push(Number(isActive)); }
 
+  // 精确匹配（小数类型）
+  if (unitPrice) { cond.push('unit_price = ?'); vals.push(Number(unitPrice)); }
+
   // 精确匹配（枚举类型）
   if (materialType) { cond.push('material_type = ?'); vals.push(materialType); }
-  if (unit) { cond.push('unit = ?'); vals.push(unit); }
 
   // 模糊匹配（字符串类型）
   if (materialCode) { cond.push('material_code LIKE ?'); vals.push(`%${materialCode}%`); }
   if (materialName) { cond.push('material_name LIKE ?'); vals.push(`%${materialName}%`); }
   if (materialSpecs) { cond.push('material_specs LIKE ?'); vals.push(`%${materialSpecs}%`); }
+  if (unit) { cond.push('unit LIKE ?'); vals.push(`%${unit}%`); }
   if (supplier) { cond.push('supplier LIKE ?'); vals.push(`%${supplier}%`); }
-
-  // 数值范围查询（单价）
-  if (unitPriceMin) { cond.push('unit_price >= ?'); vals.push(Number(unitPriceMin)); }
-  if (unitPriceMax) { cond.push('unit_price <= ?'); vals.push(Number(unitPriceMax)); }
 
   // 时间范围查询
   if (createdAtFrom) { cond.push('created_at >= ?'); vals.push(createdAtFrom); }
   if (createdAtTo) { cond.push('created_at <= ?'); vals.push(createdAtTo); }
-  if (updatedAtFrom) { cond.push('updated_at >= ?'); vals.push(updatedAtFrom); }
-  if (updatedAtTo) { cond.push('updated_at <= ?'); vals.push(updatedAtTo); }
 
   const where = cond.length ? `WHERE ${cond.join(' AND ')}` : '';
-  const sql = `SELECT * FROM material ${where} ORDER BY material_id ASC`;
+  const sql = `SELECT * FROM material ${where} ORDER BY material_id`;
 
   try {
     const [rows] = await pool.query(sql, vals);
@@ -67,6 +61,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
+
 /* ========== POST：新增物料 ========== */
 export async function POST(req: Request) {
   try {
@@ -75,18 +70,17 @@ export async function POST(req: Request) {
 
     await pool.execute(
       `INSERT INTO material
-        (material_code, material_name, material_type, material_specs, unit,
-         unit_price, supplier, is_active)
+        (material_code, material_name, material_type, material_specs, unit, unit_price, supplier, is_active)
        VALUES (?,?,?,?,?,?,?,?)`,
       [
         body.material_code,
         body.material_name,
-        body.material_type || 'Component', // 默认组件类型
+        body.material_type,
         body.material_specs || null,
-        body.unit || '个', // 默认单位
+        body.unit,
         body.unit_price || null,
         body.supplier || null,
-        body.is_active ? 1 : 0 // 布尔值转数字（1启用，0禁用）
+        body.is_active ?? 1 // 默认启用
       ]
     );
     return NextResponse.json({ ok: true });
@@ -115,12 +109,12 @@ export async function PUT(req: Request) {
       [
         body.material_code,
         body.material_name,
-        body.material_type || 'Component',
+        body.material_type,
         body.material_specs || null,
-        body.unit || '个',
+        body.unit,
         body.unit_price || null,
         body.supplier || null,
-        body.is_active ? 1 : 0,
+        body.is_active,
         body.material_id // 条件：物料ID
       ]
     );
