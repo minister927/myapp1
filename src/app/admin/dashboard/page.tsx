@@ -1,15 +1,28 @@
-// src/app/page.tsx
-'use client'
-import React from 'react';
-import { Typography } from 'antd';
+// app/dashboard/page.tsx
+import { cookies } from 'next/headers';
+import { decrypt } from '@/lib/session';
+import { redirect } from 'next/navigation';
 
-const { Title } = Typography;
+export default async function Dashboard() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
 
-const HomePage = () => (
-  <div>
-    <Title level={2} children="欢迎使用后台管理系统" />
-    <p>请从左栏选择功能模块。</p>
-  </div>
-);
+  if (!token) {
+    redirect('/login');
+  }
 
-export default HomePage;
+  const user = await decrypt(token);
+  
+  if (!user) {
+    cookieStore.delete('token');
+    redirect('/login');
+  }
+
+  return (
+    <div>
+      <h1>欢迎, {user.admin_id}!</h1>
+      <p>用户ID: {user.admin_username}</p>
+      {/* <p>角色: {user.role || '普通用户'}</p> */}
+    </div>
+  );
+}

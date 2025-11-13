@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose'; // ① 官方 ESM 验签库
+import { decrypt } from '@/lib/session';
+
 
 // 将密钥转换为 Uint8Array
 const secret = new TextEncoder().encode(process.env.SESSION_SECRET!);
@@ -25,21 +27,37 @@ export async function middleware(request: NextRequest) {
     }
 
     try {
-       // 3. 验签 + 过期检查 + 提取 payload
-      const { payload } = await jwtVerify(token, secret);// ② 验签并提取 payload登录信息,根据密钥验证身份，防止冒充
-      console.log('中间件：token 合法，payload 包含:', payload);
+      //  // 3. 验签 + 过期检查 + 提取 payload
+      // const { payload } = await jwtVerify(token, secret);// ② 验签并提取 payload登录信息,根据密钥验证身份，防止冒充
+      // console.log('中间件：token 合法，payload 包含:', payload);
       
-      // 4. 将用户信息添加到请求头，供下游使用
-      const requestHeaders = new Headers(request.headers);
-      requestHeaders.set('x-user-id', payload.admin_id?.toString() || '');
-      requestHeaders.set('x-username', payload.admin_username?.toString() || '');
+      // // 4. 将用户信息添加到请求头，供下游使用
+      // const requestHeaders = new Headers(request.headers);
+      // requestHeaders.set('x-user-id', payload.admin_id?.toString() || '');
+      // requestHeaders.set('x-username', payload.admin_username?.toString() || '');
       
-      // 5. 继续处理请求，带上修改后的 headers
-      return NextResponse.next({
-        request: {
-          headers: requestHeaders,
-        },
-      });
+      // // 5. 继续处理请求，带上修改后的 headers
+      // return NextResponse.next({
+      //   request: {
+      //     headers: requestHeaders,
+      //   },
+      // });
+
+       const payload = await decrypt(token);
+       console.log('中间件：解密后 payload 包含:', payload);
+      
+        if (!payload) {
+          // Token 无效或过期
+          const response = NextResponse.redirect(new URL('admin/login', request.url));
+          response.cookies.delete('token');
+          return response;
+        }
+
+        // Token 有效，放行
+        return NextResponse.next();
+
+
+
     } catch (e) {
       console.log('中间件：token 非法或已过期，重定向');
       return NextResponse.redirect(new URL('/admin/login', request.url));

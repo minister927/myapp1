@@ -1,25 +1,37 @@
 'use client';
 
+import { Layout, Menu, Breadcrumb, Avatar, Dropdown, Space, Typography } from 'antd';
 import { useRouter, useSelectedLayoutSegment } from 'next/navigation';
-import { Menu } from 'antd';
 import {
   UserOutlined,
   DesktopOutlined,
   AppstoreOutlined,
   PicRightOutlined,
 } from '@ant-design/icons';
+import { useState } from 'react';
 
+const { Header, Content, Sider } = Layout;
 const { SubMenu } = Menu;
 
-export default function MenuSider({ collapsed }: { collapsed?: boolean }) {
+export default function MenuSider() {
   const router = useRouter();
   const segment = useSelectedLayoutSegment(); // 取当前路由段，用于高亮
+    const [collapsed, setCollapsed] = useState(false);
 
   // 根据 segment 反推出需要展开的 SubMenu
   const openKeys: string[] = [];
   if (segment === 'bom-info') openKeys.push('bom');
 
   return (
+     <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
+        <div
+          style={{
+            height: 32,
+            margin: 16,
+            background: 'rgba(255,255,255,0.3)',
+            borderRadius: 4,
+          }}
+        />
     <Menu
       theme="dark"
       mode="inline"
@@ -71,5 +83,7 @@ export default function MenuSider({ collapsed }: { collapsed?: boolean }) {
         },
       ]}
     />
+    </Sider>
   );
+  
 }
