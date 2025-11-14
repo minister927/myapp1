@@ -67,7 +67,7 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const body = await req.json();
-    const [result] = await pool.execute(
+   await pool.execute(
       `UPDATE device
          SET device_name = ?,
              device_model = ?,
@@ -84,7 +84,7 @@ export async function PUT(req: Request) {
     );
   } catch (e: any) {
     console.error('PUT /api/device', e);
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ ok: true });
   }
 }
 

@@ -1,3 +1,4 @@
+'use client';
 import { Layout, Menu, Breadcrumb, Avatar, Dropdown, Space, Typography } from 'antd';
 import {
   UserOutlined,

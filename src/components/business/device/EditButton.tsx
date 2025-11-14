@@ -52,7 +52,6 @@ export default function EditButton({ device, onSuccess }: Props)  {
       
             if (!res.ok) throw new Error('更新失败');
       
-            message.success('设备信息已保存');
             setOpen(false);          // 关闭弹窗
             form.resetFields();      // 清空表单
             onSuccess();             //表示更新完成

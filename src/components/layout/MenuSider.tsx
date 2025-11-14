@@ -1,29 +1,20 @@
 'use client';
-
-import { Layout, Menu, Breadcrumb, Avatar, Dropdown, Space, Typography } from 'antd';
-import { useRouter, useSelectedLayoutSegment } from 'next/navigation';
+import { Layout, Menu} from 'antd';
 import {
   UserOutlined,
   DesktopOutlined,
   AppstoreOutlined,
   PicRightOutlined,
 } from '@ant-design/icons';
-import { useState } from 'react';
+import Link from "next/link";
 
-const { Header, Content, Sider } = Layout;
-const { SubMenu } = Menu;
+const {  Sider } = Layout;
+
 
 export default function MenuSider() {
-  const router = useRouter();
-  const segment = useSelectedLayoutSegment(); // 取当前路由段，用于高亮
-    const [collapsed, setCollapsed] = useState(false);
-
-  // 根据 segment 反推出需要展开的 SubMenu
-  const openKeys: string[] = [];
-  if (segment === 'bom-info') openKeys.push('bom');
 
   return (
-     <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
+     <Sider >
         <div
           style={{
             height: 32,
@@ -35,19 +26,18 @@ export default function MenuSider() {
     <Menu
       theme="dark"
       mode="inline"
-      defaultOpenKeys={openKeys}
-      selectedKeys={[`/${segment}`]}
-      onClick={({ key }) => router.push(key)}
+      // onClick={({ key }) => router.push(key)}
       items={[
         {
           key: '/admin/dashboard',
           icon: <UserOutlined />,
-          label: '首页',
+          label: <Link href="/admin/dashboard">首页</Link>,
+          
         },
         {
           key: '/customer',
           icon: <UserOutlined />,
-          label: '客户管理',
+          label: <Link href="/admin/dashboard/customer">客户管理</Link>,
         },
         {
           key: '/', // 物料管理
@@ -57,29 +47,29 @@ export default function MenuSider() {
             {
               key: '/admin/dashboard/material',
               icon: <DesktopOutlined />,
-              label: '成品信息',
+              label: <Link href="/admin/dashboard/material">成品信息</Link>,
             },
             {
               key: '/admin/dashboard/bom_info',
               icon: <PicRightOutlined />,
-              label: 'BOM 信息',
+              label: <Link href="/admin/dashboard/bom_info">BOM 信息</Link>,
             },
              {
               key: '/admin/dashboard/bom_detailinfo',
               icon: <PicRightOutlined />,
-              label: 'BOM 详情',
+              label: <Link href="/admin/dashboard/bom_detailinfo">BOM 详情</Link>,
             },
              {
               key: '/admin/dashboard/material_info',
               icon: <PicRightOutlined />,
-              label: '物料信息',
+              label: <Link href="/admin/dashboard/material_info">物料信息</Link>,
             },
           ],
         },
         {
           key: '/admin/dashboard/devicemanage',
           icon: <DesktopOutlined />,
-          label: '设备管理',
+          label: <Link href="/admin/dashboard/devicemanage">设备管理</Link>,
         },
       ]}
     />

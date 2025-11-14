@@ -2,7 +2,7 @@
 
 import MainHeader from '@/components/layout/MainHeader';
 import MenuSider from '@/components/layout/MenuSider'
-import { Layout, Menu, Breadcrumb, Avatar, Dropdown, Space, Typography } from 'antd';// 1. 引入 antd 组件需要使用'use client',该库组件是客户端渲染的
+import { Layout, Typography } from 'antd';// 1. 引入 antd 组件需要使用'use client',该库组件是客户端渲染的
 
 
 const { Header, Content, Sider } = Layout;

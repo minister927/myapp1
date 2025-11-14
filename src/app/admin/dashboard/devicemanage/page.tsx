@@ -37,6 +37,7 @@ export default function Home() {
   const fetchDevices = async () => {
     const res = await fetch('/api/device');
     const data: Device[] = await res.json();
+    console.log('device刷新列表数据:', data);
     setList(data);          // 更新 state → 页面自动重渲染
   };
 

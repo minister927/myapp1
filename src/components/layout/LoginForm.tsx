@@ -10,8 +10,6 @@ type FormValue = {
 
 export default function LoginForm() {
     const router = useRouter();
-    
-    
 
     const onFinish = async (values :FormValue) =>{//成功时用以跳转页面
        try{
