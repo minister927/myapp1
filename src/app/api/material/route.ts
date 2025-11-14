@@ -114,7 +114,7 @@ export async function PUT(req: Request) {
         body.unit,
         body.unit_price || null,
         body.supplier || null,
-        body.is_active,
+        body.is_active|| null,
         body.material_id // 条件：物料ID
       ]
     );

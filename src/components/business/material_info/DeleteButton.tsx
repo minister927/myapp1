@@ -5,20 +5,23 @@ import { Button, Popconfirm, message } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { API_PATH } from './config';
 
+
+
 export default function DeleteButton({ record, onOk }: { 
   record: any; 
   onOk: () => void 
 }) {
+  console.log('DeleteButton record:', record);
   const handleDelete = async () => {
     try {
       const res = await fetch(API_PATH, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ detail_id: record.detail_id }),
+        body: JSON.stringify({ material_id: record.material_id }),
       });
       
       if (!res.ok) throw new Error('删除失败');
-      
+      console.log('🗑️ material 删除ID:', record.material_id) ;
       message.success('删除成功');
       onOk();
     } catch (error) {

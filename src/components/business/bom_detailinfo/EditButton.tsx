@@ -5,6 +5,9 @@ import { Button, Modal, Form, Input, InputNumber, Select, message } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { API_PATH } from './config';
+import  {ConponentMaterialSelect}  from './selector';
+import { ParentMaterialSelect } from './selector';
+
 
 const { Option } = Select;
 
@@ -70,11 +73,11 @@ export default function EditButton({ record, onOk }: {
           </Form.Item>
           
           <Form.Item label="父项物料ID" name="parent_material_id" rules={[{ required: true }]}>
-            <InputNumber style={{ width: '100%' }} />
+            <ParentMaterialSelect />
           </Form.Item>
           
           <Form.Item label="子项组件ID" name="component_material_id" rules={[{ required: true }]}>
-            <InputNumber style={{ width: '100%' }} />
+            <ConponentMaterialSelect />
           </Form.Item>
           
           <Form.Item label="用量" name="quantity" rules={[{ required: true }]}>

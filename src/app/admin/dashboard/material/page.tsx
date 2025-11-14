@@ -6,6 +6,8 @@ import { Row, Col, Card, Tree, Table, Button, Modal, Form, Input, InputNumber, P
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 const { TextArea } = Input;
 import QueryBar from '@/components/business/material/QueryBar';
+import {ParentMaterialSelect} from '@/components/business/bom_detailinfo/selector';
+import {ConponentMaterialSelect} from '@/components/business/bom_detailinfo/selector';
 
 /* ---------------- 类型 ---------------- */
 type SeriesNode = {
@@ -441,11 +443,12 @@ const handleSearch = async (q: Record<string, any>) => {
               <Form.Item label="关联的BOM ID（外键）" name="bom_id">
                 <Input />
               </Form.Item>
-              <Form.Item label="父项物料ID（外键）" name="parent_material_id">
-                <Input />
+              <Form.Item label="父项物料ID" name="parent_material_id" rules={[{ required: true }]}>
+                <ParentMaterialSelect />
               </Form.Item>
-              <Form.Item label="子项（组件）物料ID（外键）" name="component_material_id">
-                <Input />
+              
+              <Form.Item label="子项组件ID" name="component_material_id" rules={[{ required: true }]}>
+                <ConponentMaterialSelect />
               </Form.Item>
               <Form.Item label="用量" name="quantity" rules={[{ required: true }]}>
                 <InputNumber style={{ width: '100%' }} />

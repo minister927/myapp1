@@ -12,6 +12,8 @@ const typeMap = {
 
 type MaterialTypeKey = keyof typeof typeMap;
 
+
+
 // material 表列配置
 export const columns = [
   { title: '物料ID', dataIndex: 'material_id', key: 'material_id', width: 80 },
