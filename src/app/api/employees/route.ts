@@ -76,60 +76,74 @@ export async function GET(req: NextRequest) {
 
 /* ====== POST /api/employees  新增 ====== */
 export async function POST(req: Request) {
-  const body = await req.json();
-  const sql = `
-    INSERT INTO employees
-      (employee_number, name, department, position, hire_date, is_active)
-    VALUES (?,?,?,?,?,?)
-  `;
-  const vals = [
-    body.employee_number,
-    body.name,
-    body.department || null,
-    body.position || null,
-    body.hire_date || null,
-    body.is_active ?? 1,
-  ];
-  await pool.execute(sql, vals);
-  return NextResponse.json({ ok: true });
+  try {
+    const body = await req.json();
+    const sql = `
+      INSERT INTO employees
+        (employee_number, name, department, position, hire_date, is_active)
+      VALUES (?,?,?,?,?,?)
+    `;
+    const vals = [
+      body.employee_number,
+      body.name,
+      body.department || null,
+      body.position || null,
+      body.hire_date || null,
+      body.is_active ?? 1,
+    ];
+    await pool.execute(sql, vals);
+    return NextResponse.json({ ok: true });
+  } catch (e: any) {
+    console.error('[POST /api/employees]', e);
+    return NextResponse.json({ ok: false, message: e.message }, { status: 500 });
+  }
 }
 
 /* ====== PATCH /api/employees  部分更新 ====== */
-//“大对象、弱网络、只改一点点 → PATCH；完整替换、重置、快照 → PUT。”
 export async function PATCH(req: Request) {
-  const body = await req.json();
-  const { employee_id, ...fields } = body;
-  if (!employee_id) throw new Error('employee_id 必填');
+  try {
+    const body = await req.json();
+    const { employee_id, ...fields } = body;
+    if (!employee_id) throw new Error('employee_id 必填');
 
-  const ALLOW: Record<string, boolean> = {
-    employee_number: true,
-    name: true,
-    department: true,
-    position: true,
-    hire_date: true,
-    is_active: true,
-  };
+    const ALLOW: Record<string, boolean> = {
+      employee_number: true,
+      name: true,
+      department: true,
+      position: true,
+      hire_date: true,
+      is_active: true,
+    };
 
-  const sets: string[] = [];
-  const vals: any[] = [];
-  Object.entries(fields).forEach(([k, v]) => {
-    if (ALLOW[k]) {
-      sets.push(`${k} = ?`);
-      vals.push(v === undefined ? null : v);
-    }
-  });
+    const sets: string[] = [];
+    const vals: any[] = [];
+    Object.entries(fields).forEach(([k, v]) => {
+      if (ALLOW[k]) {
+        sets.push(`${k} = ?`);
+        vals.push(v === undefined ? null : v);
+      }
+    });
 
-  if (sets.length === 0) return NextResponse.json({ ok: false, message: '无有效字段' }, { status: 400 });
+    if (sets.length === 0) return NextResponse.json({ ok: false, message: '无有效字段' }, { status: 400 });
 
-  const sql = `UPDATE employees SET ${sets.join(', ')} WHERE employee_id = ?`;
-  vals.push(employee_id);
-  await pool.execute(sql, vals);
-  return NextResponse.json({ ok: true });
+    const sql = `UPDATE employees SET ${sets.join(', ')} WHERE employee_id = ?`;
+    vals.push(employee_id);
+    await pool.execute(sql, vals);
+    return NextResponse.json({ ok: true });
+  } catch (e: any) {
+    console.error('[PATCH /api/employees]', e);
+    return NextResponse.json({ ok: false, message: e.message }, { status: 500 });
+  }
 }
 
 /* ====== DELETE /api/employees  删除 ====== */
 export async function DELETE(req: Request) {
-  const body = await req.json();
-  await pool.execute('DELETE FROM employees WHERE employee_id = ?', [body.employee_id]);
-  return NextResponse.json({ ok: true });
+  try {
+    const body = await req.json();
+    await pool.execute('DELETE FROM employees WHERE employee_id = ?', [body.employee_id]);
+    return NextResponse.json({ ok: true });
+  } catch (e: any) {
+    console.error('[DELETE /api/employees]', e);
+    return NextResponse.json({ ok: false, message: e.message }, { status: 500 });
+  }
 }
