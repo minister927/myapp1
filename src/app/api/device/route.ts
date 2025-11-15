@@ -7,34 +7,34 @@ import pool from '@/lib/db';
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
 
-   /* 1. 先把原始参数全部打出来 */
+   /* 1. 先把原始参数全部打出来 */////////////////////////////该多条件查询仍未逻辑上的实现，请勿使用
    console.log('🔍 原始 URL:', req.url);
    console.log('🔍 searchParams 条目:', Array.from(sp.entries()));
 
   /* 1. 取所有可选参数 */
-  const bomId          = sp.get('bom_id');
-  const bomCode        = sp.get('bom_code');
-  const bomName        = sp.get('bom_name');
-  const productId      = sp.get('product_id');
-  const bomVersion     = sp.get('bom_version');
-  const bomType        = sp.get('bom_type');        // EBOM | PBOM | MBOM
-  const bomStatus      = sp.get('bom_status');      // Develop | Released | Obsolete
-  const effectiveFrom  = sp.get('effective_from');  // 生效日期 >=
-  const effectiveTo    = sp.get('effective_to');    // 生效日期 <=
+  const deviceId          = sp.get('device_id');
+  const deviceName        = sp.get('device_name');
+  const deviceModel        = sp.get('device_model');
+  const installationLocation      = sp.get('installation_location');
+  const currentstatus     = sp.get('current_status');
+  const totalOperatingHours        = sp.get('total_operating_hours');        // EBOM | PBOM | MBOM
+  const lastMaintenanceDate      = sp.get('last_maintenance_date');      // Develop | Released | Obsolete
+  const manufacturer  = sp.get('manufacturer');  // 生效日期 >=
+  const purchaseDate    = sp.get('purchase_date');    // 生效日期 <=
 
   /* 2. 动态 WHERE */
   const cond: string[] = [];
   const vals: any[]    = [];
 
-  if (bomId)        { cond.push('bom_id = ?');        vals.push(Number(bomId)); }
-  if (bomCode)      { cond.push('bom_code LIKE ?');   vals.push(`%${bomCode}%`); }
-  if (bomName)      { cond.push('bom_name LIKE ?');   vals.push(`%${bomName}%`); }
-  if (productId)    { cond.push('product_id = ?');    vals.push(Number(productId)); }
-  if (bomVersion)   { cond.push('bom_version = ?');   vals.push(bomVersion); }
-  if (bomType)      { cond.push('bom_type = ?');      vals.push(bomType); }
-  if (bomStatus)    { cond.push('bom_status = ?');    vals.push(bomStatus); }
-  if (effectiveFrom){ cond.push('effective_date >= ?');vals.push(effectiveFrom); }
-  if (effectiveTo)  { cond.push('effective_date <= ?');vals.push(effectiveTo); }
+  if (deviceId)        { cond.push('bom_id = ?');        vals.push(Number(deviceId)); }
+  if (deviceName)      { cond.push('bom_code LIKE ?');   vals.push(`%${deviceName}%`); }
+  if (deviceModel)      { cond.push('bom_name LIKE ?');   vals.push(`%${deviceModel}%`); }
+  if (installationLocation)    { cond.push('product_id = ?');    vals.push(Number(installationLocation)); }
+  if (currentstatus)   { cond.push('bom_version = ?');   vals.push(currentstatus); }
+  if (totalOperatingHours)      { cond.push('bom_type = ?');      vals.push(totalOperatingHours); }
+  if (lastMaintenanceDate)    { cond.push('bom_status = ?');    vals.push(lastMaintenanceDate); }
+  if (manufacturer){ cond.push('effective_date >= ?');vals.push(manufacturer); }
+  if (purchaseDate)  { cond.push('effective_date <= ?');vals.push(purchaseDate); }
 
   const where = cond.length ? `WHERE ${cond.join(' AND ')}` : '';
   const sql   = `SELECT * FROM device ${where} ORDER BY device_id`;

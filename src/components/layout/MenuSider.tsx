@@ -35,10 +35,11 @@ export default function MenuSider() {
           
         },
         {
-          key: '/customer',
+          key: '/customers',
           icon: <UserOutlined />,
-          label: <Link href="/admin/dashboard/customer">客户管理</Link>,
+          label: <Link href="/admin/dashboard/employees">员工管理</Link>,
         },
+        
         {
           key: '/', // 物料管理
           icon: <AppstoreOutlined />,
@@ -70,6 +71,11 @@ export default function MenuSider() {
           key: '/admin/dashboard/devicemanage',
           icon: <DesktopOutlined />,
           label: <Link href="/admin/dashboard/devicemanage">设备管理</Link>,
+        },
+        {
+          key: '/admin/dashboard/orders',
+          icon: <DesktopOutlined />,
+          label: <Link href="/admin/dashboard/orders">订单管理</Link>,
         },
       ]}
     />
