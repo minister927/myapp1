@@ -9,6 +9,11 @@ export async function GET(req: NextRequest) {
   console.log('🔍 employees 原始 URL:', req.url);
   console.log('🔍 employees searchParams 条目:', Array.from(sp.entries()));
 
+
+    /* ---------- 1. 拿到分页参数 ---------- */
+  const page     = Number(sp.get('page') ?? 1);      // 默认第 1 页
+  const pageSize = Number(sp.get('pageSize') ?? 3);  // 你前端默认 3 条
+
   /* ---------- 1. 提取所有查询参数（仅数据库真实字段） ---------- */
   const employeeId = sp.get('employee_id');
   const empNumber  = sp.get('employee_number');
@@ -41,21 +46,28 @@ export async function GET(req: NextRequest) {
   if (position)   { cond.push('position LIKE ?');        vals.push(`%${position}%`); }
 
   const where = cond.length ? `WHERE ${cond.join(' AND ')}` : '';
-  const sql = `
+  /* ---------- 3. 先查总条数 ---------- */
+  const countSql = `SELECT COUNT(*) AS total FROM employees ${where}`;
+  const [countRows] = await pool.query(countSql, vals);
+  const total = (countRows as any)[0].total;
+  console.log('✅ employees 总条数查询成功:', total);
+  console.log('🔍 绑定值:', vals);
+
+  const dataSql  = `
     SELECT employee_id, employee_number, name, department, position,
            hire_date, is_active, created_at, updated_at
     FROM employees
     ${where}
     ORDER BY employee_id DESC
+    LIMIT ? OFFSET ?
   `;
-
-  /* ---------- 3. 执行 & 日志 ---------- */
   try {
-    const [rows] = await pool.query(sql, vals);
+    vals.push(pageSize, (page - 1) * pageSize);//limit & offset 绑定值,限制几条数据，跳过几条数据
+    const [rows] = await pool.query(dataSql, vals);
     console.log('✅ employees 查询成功，记录数:', Array.isArray(rows) ? rows.length : 0);
-    console.log('🔍 SQL:', sql);
+    console.log('🔍 SQL:', dataSql);
     console.log('🔍 绑定值:', vals);
-    return NextResponse.json(rows);
+    return NextResponse.json({rows,total});
   } catch (error: any) {
     console.error('❌ employees 查询失败:', error);
     return NextResponse.json({ error: '查询失败', details: error.message }, { status: 500 });
