@@ -14,7 +14,8 @@ export default function updatechangelog({ record ,onOk}: { record: any; onOk: ()
 
    // 当弹窗打开且record.bom_id存在时，加载变更记录
   useEffect(() => {
-    if (!open || !record?.bom_id) return;
+    if (!open || !record?.bom_id) 
+      return;
 
     const loadChangeLog = async () => {
       try {

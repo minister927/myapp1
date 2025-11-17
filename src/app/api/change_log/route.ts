@@ -37,11 +37,71 @@ export async function GET(req: NextRequest) {
   }
 }
 
+
+/* ==================== POST: 新增变更记录 ==================== */
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const {
+      bom_id,
+      change_type,
+      change_description,
+      change_reason,
+      changed_by,
+    } = body;
+
+    // // 必填字段校验
+    // if (!bom_id || !change_type || !change_description || !change_reason || !changed_by) {
+    //   return NextResponse.json(
+    //     { error: '缺少必填字段（bom_id, change_type, change_description, change_reason, changed_by）' },
+    //     { status: 400 }
+    //   );
+    // }
+
+    const sql = `
+      INSERT INTO bom_change_log 
+        (bom_id, change_type, change_description, change_reason, changed_by)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      Number(bom_id),
+      change_type || 'Update',
+      change_description,
+      change_reason,
+      changed_by,
+    ];
+
+    console.log('🔍 插入 SQL:', sql);
+    console.log('🔍 绑定值:', values);
+
+    const [result] = await pool.query(sql, values);
+
+    // 获取插入后的 ID（MySQL 默认返回 insertId）
+    const insertId = (result as any).insertId;
+
+    return NextResponse.json({
+      success: true,
+      message: '新增变更记录成功',
+      data: { change_id: insertId },
+    });
+  } catch (error: any) {
+    console.error('❌ 新增 bom_change_log 失败:', error);
+    return NextResponse.json(
+      { error: '新增失败', details: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+
+
+
 /* ==================== PUT: 更新变更记录 ==================== */
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    const { change_id, bom_id, change_type, change_description, change_reason, changed_by, changed_at } = body;
+    const { change_id, bom_id, change_type, change_description, change_reason, changed_by } = body;
 
     // 验证必要字段
     if (!change_id) {
@@ -60,7 +120,7 @@ export async function PUT(req: NextRequest) {
     if (change_description !== undefined) { fields.push('change_description = ?'); values.push(change_description); }
     if (change_reason !== undefined) { fields.push('change_reason = ?'); values.push(change_reason); }
     if (changed_by !== undefined) { fields.push('changed_by = ?'); values.push(changed_by); }
-    if (changed_at !== undefined) { fields.push('changed_at = ?'); values.push(changed_at); }
+    // if (changed_at !== undefined) { fields.push('changed_at = ?'); values.push(changed_at); }//change_at似乎在数据库会实时更新
 
     if (fields.length === 0) {
       return NextResponse.json(

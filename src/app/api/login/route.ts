@@ -38,7 +38,7 @@ export async function POST( req: Request) {
       const response = NextResponse.json({ ok: true, message: '登录成功',user: userData });
 
       response.cookies.set('token', token, {
-        httpOnly: true,
+        httpOnly: false,//不传私密信息，改为false,方便客户端组件取用
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7,

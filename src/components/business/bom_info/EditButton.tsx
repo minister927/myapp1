@@ -4,11 +4,11 @@
 import { useState } from 'react';
 import { Button, Form, Input, Modal, Select, message } from 'antd';
 import { API_PATH } from './config';
-import { getCurrentUser } from '@/lib/get-user';//bu允许在客户端组件中使用该工具，next/headers 是服务端专属 API，不能在浏览器中运行。客户端组件需要数据时，必须通过 Props 从服务端组件传递下来。
+// import { getCurrentUser } from '@/lib/get-user';//bu允许在客户端组件中使用该工具，next/headers 是服务端专属 API，不能在浏览器中运行。客户端组件需要数据时，必须通过 Props 从服务端组件传递下来。
 
 const { Option } = Select;
 
-export default function EditButton({ record, onOk }: { record: any; onOk: () => void }) {
+export default function EditButton({ EditUser,record, onOk }: { EditUser:any ;record: any; onOk: () => void }) {
   
   const [openEdit, setOpenEdit] = useState(false);
   const [openReason, setOpenReason] = useState(false);
@@ -16,15 +16,25 @@ export default function EditButton({ record, onOk }: { record: any; onOk: () => 
   const [form] = Form.useForm();
   const [reasonForm] = Form.useForm();
 
+
+
+
   const handleEditClick = () => {
     reasonForm.resetFields();
     console.log('编辑记录:', record);
-    reasonForm.setFieldsValue(record);
+    // reasonForm.setFieldsValue(record);
+    reasonForm.setFieldsValue({
+      bom_id: record.bom_id,
+      changed_by: EditUser.user.admin_username,
+    });
+    console.log('编辑的用户：', EditUser);
+    console.log('编辑的用户用户名：', EditUser.user.admin_username);
     setOpenReason(true);
   }
 
   const handleReasonOk = async () => {
     try {
+
       await reasonForm.validateFields();
       setOpenReason(false);
       setOpenEdit(true);
@@ -37,27 +47,19 @@ export default function EditButton({ record, onOk }: { record: any; onOk: () => 
   const handleEditOk = async () => {
     try {
       const editValues = await form.validateFields();
+      console.log('编辑值:', editValues);
       const reasonValues = reasonForm.getFieldsValue();
-      
+      console.log('变更原因值:', reasonValues);
       setLoading(true);
     
       // 获取当前用户名（应从 session 或 context 获取）
       const changedBy = 'getCurrentUser'; // TODO: 从 session 获取
       
-      // 记录变更日志
-      const changeLogData = {
-        bom_id: 0, // 物料变更不关联BOM，设为0
-        change_type: 'Update',
-        change_description: `编辑物料: ${record.material_code} - ${record.material_name}`,
-        change_reason: reasonValues.change_reason,
-        changed_by: changedBy,
-      };
-      
       // 先记录变更日志
-      const logRes = await fetch('/api/bom_change_log', {
+      const logRes = await fetch('/api/change_log', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(changeLogData),
+        body: JSON.stringify(reasonValues),
       });
       
       if (!logRes.ok) {
@@ -101,7 +103,7 @@ export default function EditButton({ record, onOk }: { record: any; onOk: () => 
       >
         <Form form={reasonForm} layout="vertical">
           <Form.Item label="BomId" name="bom_id" rules={[{ required: true }]}>
-            <Input readOnly  />
+            <Input readOnly />
           </Form.Item>
           <Form.Item label="变更人" name="changed_by" rules={[{ required: true }]}>
             <Input />
@@ -134,6 +136,14 @@ export default function EditButton({ record, onOk }: { record: any; onOk: () => 
       >
         <Form form={form} layout="vertical">
           {/* 与 AddButton 表单完全一致 */}
+          <Form.Item
+            label="BomId"
+            name="bom_id"
+            rules={[{ required: true, message: 'BomId 不能为空' }]}
+            style={{ display: 'none' }}   /* ← 整个 Form.Item 都不可见 */
+          >
+            <Input />                      {/* 不需要再加 hidden */}
+          </Form.Item>
           <Form.Item label="BOM编码" name="bom_code" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
