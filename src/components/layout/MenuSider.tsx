@@ -89,12 +89,12 @@ export default function MenuSider() {
               {
                 key: '/admin/dashboard/customers',
                 icon: <CustomerServiceOutlined />,
-                label: <Link href="/admin/dashboard/customers">客户管理</Link>,
+                label: <Link href="/admin/dashboard/customers">客户档案</Link>,
               },
               {
                 key: '/admin/dashboard/orders',
                 icon: <FileTextOutlined />,
-                label: <Link href="/admin/dashboard/orders">订单管理</Link>,
+                label: <Link href="/admin/dashboard/orders">订单信息</Link>,
               },
             ],
           },
