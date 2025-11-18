@@ -24,8 +24,8 @@ export async function GET(req: NextRequest) {
     const [rows] = await pool.query(sql, [Number(bomId)]);
     
     console.log(`✅ BOM ${bomId} 变更记录查询成功，共 ${Array.isArray(rows) ? rows.length : 0} 条`);
-    console.log('🔍 SQL:', sql);
-    console.log('🔍 绑定值:', [bomId]);
+    console.log('🔍 查询change_log SQL:', sql);
+    console.log('🔍 查询change_log 绑定值:', [bomId]);
     
     return NextResponse.json(rows);
   } catch (error: any) {
@@ -66,14 +66,14 @@ export async function POST(req: NextRequest) {
 
     const values = [
       Number(bom_id),
-      change_type || 'Update',
+      change_type ,
       change_description,
-      change_reason,
+      change_reason || null,
       changed_by,
     ];
 
-    console.log('🔍 插入 SQL:', sql);
-    console.log('🔍 绑定值:', values);
+    console.log('🔍 插入 change_log SQL:', sql);
+    console.log('🔍 插入 change_log 绑定值:', values);
 
     const [result] = await pool.query(sql, values);
 

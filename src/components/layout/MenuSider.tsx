@@ -46,9 +46,9 @@ export default function MenuSider() {
 
           /* ===== 物料管理 ===== */
           {
-            key: 'material-mgmt',   // 只要唯一即可
+            key: 'bom-mgmt',   // 只要唯一即可
             icon: <AppstoreOutlined />,
-            label: '物料管理',
+            label: 'BOM管理',
             children: [
               {
                 key: '/admin/dashboard/material',
@@ -65,14 +65,43 @@ export default function MenuSider() {
                 icon: <FileTextOutlined />,
                 label: <Link href="/admin/dashboard/bom_detailinfo">BOM 详情</Link>,
               },
+             
+            ],
+          },
+           /* ===== 物料管理 ===== */
+          {
+            key: 'material-mgmt',   // 只要唯一即可
+            icon: <AppstoreOutlined />,
+            label: '物料管理',
+            children: [
               {
                 key: '/admin/dashboard/material_info',
                 icon: <BuildOutlined />,
-                label: <Link href="/admin/dashboard/material_info">物料信息</Link>,
+                label: <Link href="/admin/dashboard/material_info">物料档案</Link>,
               },
+               {
+                key: '/admin/dashboard/material_type',
+                icon: <BuildOutlined />,
+                label: <Link href="/admin/dashboard/material_type">物料类型</Link>,
+                },
+                {
+                key: '/admin/dashboard/spare_part_inventory',
+                icon: <BuildOutlined />,
+                label: <Link href="/admin/dashboard/spare_part_inventory">库存管理</Link>,
+                },
+                {
+                key: '/admin/dashboard/spare_part_outbound',
+                icon: <BuildOutlined />,
+                label: <Link href="/admin/dashboard/spare_part_outbound">出库管理</Link>,
+                },
+                {
+                key: '/admin/dashboard/spare_part_inbound',
+                icon: <BuildOutlined />,
+                label: <Link href="/admin/dashboard/spare_part_inbound">入库管理</Link>,
+                },
+
             ],
           },
-
           /* ===== 设备管理 ===== */
           {
             key: '/admin/dashboard/devicemanage',

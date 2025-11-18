@@ -22,13 +22,6 @@ const priorityMap = {
 } as const;
 type PriorityKey = keyof typeof priorityMap;
 
-/* =================== 币种符号映射（可选） =================== */
-const currencySymbol: Record<string, string> = {
-  CNY: '¥',
-  USD: '$',
-  EUR: '€',
-};
-
 /* =================== 订单列表列配置 =================== */
 export const columns = [
   { title: '订单ID', dataIndex: 'order_id', key: 'order_id', width: 80 },
@@ -42,11 +35,8 @@ export const columns = [
     render: (d: string) => d ? new Date(d).toLocaleDateString() : '未交付' },
 
   { title: '总数量', dataIndex: 'total_quantity', key: 'total_quantity', align: 'right' as const },
-  { title: '总金额', dataIndex: 'total_amount', key: 'total_amount', align: 'right' as const,
-    render: (_: number, record: any) =>
-      `${currencySymbol[record.currency] ?? '¥'}${Number(record.total_amount).toFixed(2)}` },
+  { title: '总金额', dataIndex: 'total_amount', key: 'total_amount', align: 'right' as const},
 
-  { title: '币种', dataIndex: 'currency', key: 'currency', width: 60 },
   { title: '订单状态', dataIndex: 'order_status', key: 'order_status', width: 100,
     render: (s: string) => statusMap[s as StatusKey] ?? s },
   // { title: '优先级', dataIndex: 'priority', key: 'priority', width: 90,

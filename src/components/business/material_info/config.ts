@@ -53,7 +53,6 @@ export const columns = [
     title: '单价', 
     dataIndex: 'unit_price', 
     key: 'unit_price',
-    render: (price: number) => price ? `¥${Number(price).toFixed(2)}` : '-'
   },
   { 
     title: '默认供应商', 

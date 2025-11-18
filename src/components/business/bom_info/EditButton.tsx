@@ -51,9 +51,6 @@ export default function EditButton({ EditUser,record, onOk }: { EditUser:any ;re
       const reasonValues = reasonForm.getFieldsValue();
       console.log('变更原因值:', reasonValues);
       setLoading(true);
-    
-      // 获取当前用户名（应从 session 或 context 获取）
-      const changedBy = 'getCurrentUser'; // TODO: 从 session 获取
       
       // 先记录变更日志
       const logRes = await fetch('/api/change_log', {
@@ -118,7 +115,9 @@ export default function EditButton({ EditUser,record, onOk }: { EditUser:any ;re
           >
             <Input.TextArea rows={3} placeholder="请描述变更原因..." />
           </Form.Item>
-          
+          <Form.Item name="change_type" initialValue="update" noStyle>
+            <Input type="hidden" />
+          </Form.Item>
         </Form>
       </Modal>
       

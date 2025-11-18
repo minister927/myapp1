@@ -14,7 +14,6 @@ export default function BomTable(user: any) {
   const [data, setData] = useState<any[]>([]);         //定义返回的data数组的类型
   const [loading, setLoading] = useState(true);    //用以判断是否在加载状态的常量
   const [keyword, setKeyword] = useState('');      //搜索栏所用的关键字
-  console.log('BomTable 的操作用户:',user );  
 
   const fetchData = async () => {
     setLoading(true);                    //打开加载动画
@@ -56,7 +55,7 @@ export default function BomTable(user: any) {
         {/* record={record} 用以将当前行的数据交与子组件*/}
         <ChangeLog record={record}  onOk={fetchData}/>
         <EditButton EditUser={user} record={record} onOk={fetchData} />       
-        <DeleteButton record={record} onOk={fetchData} />
+        <DeleteButton  record={record} onOk={fetchData} />
       </>
     ),
   };
@@ -80,7 +79,7 @@ export default function BomTable(user: any) {
     <div>
       <div style={{ marginBottom: 16 }}>
         <QueryBar onSearch={handleSearch} />
-        <AddButton onOk={fetchData} />
+        <AddButton  onOk={fetchData} />
       </div>
       <Table
         rowKey="bom_id"                   //主键字段

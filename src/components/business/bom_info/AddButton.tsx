@@ -26,6 +26,7 @@ export default function AddButton({ onOk }: { onOk: () => void }) {
     } catch (e) {
       message.error('新增失败');
     }
+    
   };
 
   return (
