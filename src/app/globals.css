@@ -24,3 +24,12 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+/* styles/antd-cover.css 或 globals.css 末尾 */
+.ant-message {
+  @apply z-50; /* 保证在最顶层 */
+}
+.ant-message-notice-content {
+  @apply shadow-xl rounded-lg; /* 可选：恢复圆角阴影 */
+}

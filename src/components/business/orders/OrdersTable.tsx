@@ -2,7 +2,7 @@
 
 import { Table, message } from 'antd';
 import { useEffect, useState } from 'react';
-import { API_PATH, columns, fields } from './config';
+import { API_PATH, columns } from './config';
 import AddButton from './AddButton';
 import EditButton from './EditButton';
 import DeleteButton from './DeleteButton';
@@ -61,7 +61,7 @@ export default function OrdersTable() {
   };
 
 
-   /* ---------- 页码/页大小变化 ---------- */
+  /* ---------- 页码/页大小变化 ---------- */
   const handleTableChange = (p: any) => {
     setPage(p.current);
     setPageSize(p.pageSize);
@@ -79,7 +79,7 @@ export default function OrdersTable() {
         loading={loading}                 //判断加载状态
         columns={[...columns, actions]}   //合并静态列和操作列，两个列合成到一个列内
         dataSource={data}                //赋予数据
-         pagination={{
+        pagination={{
           current: page,//当前页码
           pageSize,//每页条数
           total,// ④ 总条数

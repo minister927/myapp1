@@ -5,22 +5,16 @@ import {
   DesktopOutlined,
   DownOutlined,
 } from '@ant-design/icons';
+import useBreadcrumb from '@/components/hooks/useBreadcrumb';
+import useUserMenu from '@/components/hooks/useUserMenu';
 
 const { Header, Content, Sider } = Layout;
 const { Text } = Typography;
 
 export default function MainHeader() {
+  const breadcrumbItems = useBreadcrumb();//将面包屑逻辑脱离易于复用
 
-     const userMenu = [
-    { key: 'profile', label: '个人中心' },
-    { key: 'logout', label: '退出登录' },
-  ];
-
-
-  const breadcrumbItems = [
-    { title: '首页' },
-    { title: '设备管理' },
-  ];
+     const userMenu = useUserMenu();
 
   return (
     <Header

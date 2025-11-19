@@ -34,11 +34,11 @@ export async function POST( req: Request) {
        console.log('用户信息：', userData);
       const token = await encrypt(userData);
       
-       // 2. 把 JWT 种到 Cookie（让浏览器自动带）
+       // 2. 把 JWT 种到 Cookie（让浏览器自动带） 
       const response = NextResponse.json({ ok: true, message: '登录成功',user: userData });
 
       response.cookies.set('token', token, {
-        httpOnly: false,//不传私密信息，改为false,方便客户端组件取用
+        httpOnly: true,//不传私密信息，改为false,方便客户端组件取用
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7,
